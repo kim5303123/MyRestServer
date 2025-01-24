@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -67,9 +69,35 @@ public class TodoApiController {
 			) {
 		TodoItem savedTodo = todoRepository.save(todoItem);
 		
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.header("Location", "/api/todos/" + savedTodo.getId())
-				.body(savedTodo);
-		//	TODO: 나중에 수정
+//		return ResponseEntity.status(HttpStatus.CREATED)
+//				.header("Location", "/api/todos/" + savedTodo.getId())
+//				.body(savedTodo);
+		URI location =
+				URI.create("/api/todos/" + savedTodo.getId());
+		return ResponseEntity.created(location).body(savedTodo);
+		
+	}
+	
+//	기존 TodoItem 수정
+	@PutMapping("/{id}")	//	/api/todos/{id}
+	public ResponseEntity<TodoItem> updateTodo(@PathVariable Long id, @RequestBody TodoItem updatedTodo) {
+		return todoRepository.findById(id).map(todo -> {
+			todo.setTitle(updatedTodo.getTitle());
+			todo.setCompleted(updatedTodo.isCompleted());
+			TodoItem savedTodo = todoRepository.save(todo);
+			return ResponseEntity.ok(savedTodo);
+		}).orElseGet(() -> ResponseEntity.notFound().build());
+		}
+	
+//	기존 TodoItem 항목 삭제
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteTodo(@PathVariable Long id) {
+		Optional<TodoItem> existingTodo = todoRepository.findById(id);
+//		객체가 없으면 404 error
+		if(!existingTodo.isPresent()) {
+			return ResponseEntity.notFound().build();
+		} 
+		todoRepository.deleteById(id);
+		return ResponseEntity.ok().<Void>build();
 	}
 }
