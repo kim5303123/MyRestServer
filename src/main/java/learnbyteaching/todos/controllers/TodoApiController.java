@@ -25,9 +25,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import learnbyteaching.todos.repositories.dao.TodoRepository;
 import learnbyteaching.todos.repositories.vo.TodoItem;
 
-@CrossOrigin(origins = "*",	//	모든 호스트로부터의 오리진 허가
-	methods= {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE }	
-)
+//@CrossOrigin(origins = "*",	//	모든 호스트로부터의 오리진 허가
+//	methods= {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE }	
+//)
+// -> Global CORS 정책으로 위임
 @RequestMapping("/api/todos")
 @RestController	// @Controller + @ResponseBody
 public class TodoApiController {
